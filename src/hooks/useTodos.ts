@@ -2,15 +2,19 @@ import axios from "axios";
 import { Todo } from "../components/TodoList";
 import { useQuery } from "@tanstack/react-query";
 
-const useTodos = () =>{
-    const fetchtodos = () =>
+const useTodos = (userId:  number | undefined) =>{
+    const fetchtodos = (userId: number | undefined) =>
     axios
-      .get<Todo[]>("https://jsonplaceholder.typicode.com/todos")
+      .get<Todo[]>("https://jsonplaceholder.typicode.com/todos",{
+        params:{
+            userId
+        }
+      })
       .then((res) => res.data);
 
   const { data, error, isLoading } = useQuery<Todo[],Error>({
-    queryKey: ["todos"],
-    queryFn: fetchtodos,
+    queryKey: ["todos",userId],
+    queryFn: ()=>fetchtodos(userId)
   });
 
   return {data, error, isLoading}
