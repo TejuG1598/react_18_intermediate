@@ -1,24 +1,27 @@
 import axios from "axios";
 import { PageQuery, Todo } from "../components/TodoList";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 const useTodos = (pageQuery: PageQuery) =>{
-    const fetchtodos = ({pageNumber, pageSize}: PageQuery) =>
+    const fetchtodos = (pageParam: number) =>
     axios
       .get<Todo[]>("https://jsonplaceholder.typicode.com/todos",{
         params:{
-            _start: (pageNumber -1) * pageSize,
-            _limit: pageSize
+            _start: (pageParam -1) * pageQuery.pageSize,
+            _limit: pageQuery.pageSize
         }
       })
       .then((res) => res.data);
 
-  const { data, error, isLoading } = useQuery<Todo[],Error>({
+  const { data, error, isLoading, fetchNextPage } = useInfiniteQuery<Todo[],Error>({
     queryKey: ["todos",pageQuery],
-    queryFn: ()=>fetchtodos(pageQuery)
+    queryFn: ({pageParam})=>fetchtodos(pageParam),
+    getNextPageParam: (lastPage, allPages) => {
+        return lastPage.length > 0 ? allPages.length + 1 : undefined
+    }
   });
 
-  return {data, error, isLoading}
+  return {data, error, isLoading, fetchNextPage}
 
 }
 
