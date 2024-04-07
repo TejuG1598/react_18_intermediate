@@ -9,14 +9,16 @@ interface Todo {
 const TodoList = () => {
   const fetchtodos = () =>
     axios
-      .get<Todo[]>("https://jsonplaceholder.typicode.com/todos")
+      .get<Todo[]>("https://xjsonplaceholder.typicode.com/todos")
       .then((res) => res.data);
 
-  const { data } = useQuery<Todo[]>({
+  const { data, error } = useQuery<Todo[],Error>({
     queryKey: ["todos"],
     queryFn: fetchtodos,
   });
-  
+
+  if(error) return <p>{error.message}</p>
+
   return (
     <>
       <div className="container">
