@@ -1,20 +1,21 @@
 import axios from "axios";
-import { Todo } from "../components/TodoList";
+import { PageQuery, Todo } from "../components/TodoList";
 import { useQuery } from "@tanstack/react-query";
 
-const useTodos = (userId:  number | undefined) =>{
-    const fetchtodos = (userId: number | undefined) =>
+const useTodos = (pageQuery: PageQuery) =>{
+    const fetchtodos = ({pageNumber, pageSize}: PageQuery) =>
     axios
       .get<Todo[]>("https://jsonplaceholder.typicode.com/todos",{
         params:{
-            userId
+            _start: (pageNumber -1) * pageSize,
+            _limit: pageSize
         }
       })
       .then((res) => res.data);
 
   const { data, error, isLoading } = useQuery<Todo[],Error>({
-    queryKey: ["todos",userId],
-    queryFn: ()=>fetchtodos(userId)
+    queryKey: ["todos",pageQuery],
+    queryFn: ()=>fetchtodos(pageQuery)
   });
 
   return {data, error, isLoading}

@@ -6,21 +6,20 @@ export interface Todo {
   title: string;
 }
 
+export interface PageQuery{
+  pageNumber: number;
+  pageSize: number
+}
+
 const TodoList = () => {
-  const [userId,setUserId] = useState<number>();
-  const { data, error, isLoading } = useTodos(userId);
+  const [pageQuery, setPageQuery] = useState<PageQuery>({pageNumber: 1, pageSize: 20});
+  const { data, error, isLoading } = useTodos(pageQuery);
   if (error) return <p>{error.message}</p>;
   if (isLoading) return <p>Loading ..</p>;
 
   return (
     <>
       <div className="container mt-5">
-        <select name="" value={userId} className="form-select mb-3" onChange={(event) => setUserId(parseInt(event.target.value))}>
-          <option value="">Select user</option>
-          <option value="1">user1</option>
-          <option value="2">user2</option>
-          <option value="3">user3</option>
-        </select>
         <ul className="list-group">
           {data?.map((todo) => (
             <li className="list-group-item" key={todo.id}>
@@ -28,6 +27,10 @@ const TodoList = () => {
             </li>
           ))}
         </ul>
+        <div className="row mt-3">
+          <div className="col-sm-1"><button className="btn btn-info" disabled={pageQuery.pageNumber === 1} onClick={()=>setPageQuery({...pageQuery,pageNumber: pageQuery.pageNumber-1})}>prev</button></div>
+          <div className="col-sm-1"><button className="btn btn-info" disabled={pageQuery.pageNumber >=  pageQuery.pageSize} onClick={()=>setPageQuery({...pageQuery,pageNumber: pageQuery.pageNumber+1})}>next</button></div>
+        </div>
       </div>
     </>
   );
