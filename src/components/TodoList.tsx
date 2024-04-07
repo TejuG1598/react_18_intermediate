@@ -10,7 +10,7 @@ export interface PageQuery {
 }
 
 const TodoList = () => {
-  const { data, error, isLoading, fetchNextPage } = useTodos({ pageSize: 20 });
+  const { data, error, isLoading, fetchNextPage, isFetchingNextPage } = useTodos({ pageSize: 20 });
   if (error) return <p>{error.message}</p>;
   if (isLoading) return <p>Loading ..</p>;
 
@@ -24,8 +24,8 @@ const TodoList = () => {
         </ul>
         <div className="row mt-3">
           <div className="col-sm-3">
-            <button className="btn btn-info" onClick={() => fetchNextPage()}>
-              Load more
+            <button className="btn btn-info" disabled={isFetchingNextPage} onClick={() => fetchNextPage()}>
+              {isFetchingNextPage ? 'Loading ..' : 'Load more'}
             </button>
           </div>
         </div>

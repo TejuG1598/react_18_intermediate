@@ -13,7 +13,7 @@ const useTodos = (pageQuery: PageQuery) =>{
       })
       .then((res) => res.data);
 
-  const { data, error, isLoading, fetchNextPage } = useInfiniteQuery<Todo[],Error>({
+  const { data, error, isLoading, fetchNextPage, isFetchingNextPage } = useInfiniteQuery<Todo[],Error>({
     queryKey: ["todos",pageQuery],
     queryFn: ({pageParam})=>fetchtodos(pageParam),
     getNextPageParam: (lastPage, allPages) => {
@@ -21,7 +21,7 @@ const useTodos = (pageQuery: PageQuery) =>{
     }
   });
 
-  return {data, error, isLoading, fetchNextPage}
+  return {data, error, isLoading, fetchNextPage, isFetchingNextPage}
 
 }
 
