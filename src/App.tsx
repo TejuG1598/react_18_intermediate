@@ -1,10 +1,13 @@
-import TodoList from "./components/TodoList"
+// import TodoList from "./components/TodoList"
+
+import GroceryListTable from "./components/GroceryListTable"
 
 
 function App() {
   
   return (<>
-    <TodoList/>
+    {/* <TodoList/> */}
+    <GroceryListTable/>
   </>)
 }
 
