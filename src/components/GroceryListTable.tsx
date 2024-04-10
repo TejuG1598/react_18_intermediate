@@ -47,7 +47,7 @@ const GroceryListTable = () => {
                 <td>{eachGrocery.id}</td>
                 <td>{eachGrocery.name}</td>
                 <td>{eachGrocery.price}</td>
-              </tr>
+              </tr> 
             );
           })}
         </tbody>

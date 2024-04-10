@@ -7,15 +7,18 @@ export interface GroceryInterface {
   price: number;
 }
 
+// interface ContextType {
+//     previousGroceryList : GroceryInterface[]
+// }
+
+
 function useGroceries() {
   const queryClient = useQueryClient();
   const getGroceries = () =>
     apiClient.get("/groceries").then((res) => res.data);
-    
+
   const postGroceries = (groceryItem: GroceryInterface) =>
-    apiClient
-      .post("/groceries", groceryItem)
-      .then((res) => res.data);
+    apiClient.post("/groceries", groceryItem).then((res) => res.data);
 
   const {
     data: groceriesListData,
@@ -26,21 +29,37 @@ function useGroceries() {
     queryFn: getGroceries,
   });
 
-    //Here we are just adding a grocery to groceries[]
-    //const updaterFunction = (groceryItem: GroceryInterface, groceries: GroceryInterface[]) => [...groceries,groceryItem]
+  //Here we are just adding a grocery to groceries[]
+  const updaterFunction = (groceryItem: GroceryInterface, groceriesListData: GroceryInterface[]) => [...groceriesListData, groceryItem];
+
+  const updateGrocery = (apiResponse: GroceryInterface, groceries: GroceryInterface[]) => {
+        return groceries.map(grocery => grocery.name == apiResponse.name ? apiResponse : grocery)
+  }
 
   const addingGrocery = useMutation({
-    mutationFn: (groceryItem: GroceryInterface) => postGroceries(groceryItem),
-    onSuccess: () => 
-    // Approch 1: invalidate cache
-     queryClient.invalidateQueries(["groceriesKey"])
-     //APPROACH2: Modify cache directly: 
-            //first parameter = queryKey
-            //second parameter = function to update data to groceries list. Observe that we added alias name as 'groceries' to data in useQuery()
-           // queryClient.setQueriesData(['groceries'],updaterFunction(apiResponse,(groceries || [])))
-  })
 
-  return { groceriesListData, error, isLoading , addingGrocery};
+    onMutate: (groceryItem: GroceryInterface) => {
+        const previousGroceryList = queryClient.getQueryData(["groceriesKey"])
+        queryClient.setQueryData(["groceriesKey"],updaterFunction(groceryItem, groceriesListData || []))
+        return previousGroceryList;
+    },
+
+    mutationFn: (groceryItem: GroceryInterface) => postGroceries(groceryItem),
+
+    //Success from API
+    onSuccess: (apiResponse) => queryClient.setQueryData(["groceriesKey"],updateGrocery(apiResponse, (groceriesListData || []))),
+
+    //Error from API
+    onError:(error,groceryItem , previousData )=>{
+        if (!previousData) return;
+        queryClient.setQueryData(["groceriesKey"],previousData)
+    }
+
+    
+        
+  });
+
+  return { groceriesListData, error, isLoading, addingGrocery };
 }
 
 export default useGroceries;
