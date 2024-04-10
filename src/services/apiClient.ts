@@ -1,9 +1,21 @@
 import axios from "axios";
 
-const apiClient = axios.create({
-  baseURL: "http://grocerieseasy.net",
+const axiosInstance = axios.create({
+    baseURL: 'http://grocerieseasy.net'
+})
+class APIClient<T>{
+    endpoint: string
 
-  // baseURL: 'https://jsonplaceholder.typicode.com'
-});
+    constructor(endpoint: string){
+        this.endpoint=endpoint;
+    }
 
-export default apiClient;
+    getAll=()=>{
+        return axiosInstance.get(this.endpoint).then(res => res.data)
+    }
+
+    postItem=(item: T)=>{
+        return axiosInstance.post(this.endpoint, item).then(res => res.data)
+    }
+}
+export default APIClient

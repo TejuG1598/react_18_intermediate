@@ -1,5 +1,5 @@
 import useGroceries from "../hooks/useGroceries";
-import InputEachGrocery from "./InputEachGrocery";
+import InputEachGrocery from "./GroceryForm";
 
 const GroceryListTable = () => {
   const { groceriesListData, error, isLoading } = useGroceries();
@@ -46,7 +46,7 @@ const GroceryListTable = () => {
                 <th scope="row">{count++}</th>
                 <td>{eachGrocery.id}</td>
                 <td>{eachGrocery.name}</td>
-                <td>{eachGrocery.price}</td>
+                <td>{eachGrocery.price.toFixed(2)}</td>
               </tr> 
             );
           })}
