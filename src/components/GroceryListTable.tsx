@@ -1,8 +1,10 @@
+import useDeleteGrocery from "../hooks/useDeleteGrocery";
 import useGroceries from "../hooks/useGroceries";
 import InputEachGrocery from "./GroceryForm";
 
 const GroceryListTable = () => {
-  const { groceriesListData, error, isLoading } = useGroceries();
+  const { groceries, error, isLoading } = useGroceries();
+  const {deleteGrocery} = useDeleteGrocery();
   let count = 1
 
   if (isLoading)
@@ -28,30 +30,39 @@ const GroceryListTable = () => {
 
   return (
     <>
-    <InputEachGrocery/>
-    <div className="container mt-5">
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">ID</th>
-            <th scope="col">Name</th>
-            <th scope="col">Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {groceriesListData?.map((eachGrocery) => {
-            return (
-              <tr key={eachGrocery.id}>
-                <th scope="row">{count++}</th>
-                <td>{eachGrocery.id}</td>
-                <td>{eachGrocery.name}</td>
-                <td>{eachGrocery.price.toFixed(2)}</td>
-              </tr> 
-            );
-          })}
-        </tbody>
-      </table>
+      <InputEachGrocery />
+      <div className="container mt-5">
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Price</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {groceries?.map((eachGrocery) => {
+              return (
+                <tr key={eachGrocery.id}>
+                  <th scope="row">{count++}</th>
+                  <td>{eachGrocery.id}</td>
+                  <td>{eachGrocery.name}</td>
+                  <td>${eachGrocery.price.toFixed(2)}</td>
+                  <td><button className="btn btn-outline-danger" onClick={() => deleteGrocery.mutate(eachGrocery) }>delete</button></td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot>
+            <td></td>
+            <td></td>
+            <td>Total</td>
+            <td>${groceries?.reduce((acc, grocery) => acc + grocery.price, 0)}</td>
+            <td></td>
+          </tfoot>
+        </table>
       </div>
     </>
   );

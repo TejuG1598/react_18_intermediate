@@ -1,51 +1,34 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import useGroceries from "./useGroceries";
 import { CACHE_QUERY_KEY } from "../utils/Constants";
-import APIClient from "../services/apiClient";
-import { Grocery } from "../services/groceryService";
+import groceryService, { Grocery } from "../services/groceryService";
 
-const apiClient = new APIClient("/groceries");
+
+interface Context{
+  previousGroceries: Grocery[]
+}
 
 function useAddGrocery() {
+
   const queryClient = useQueryClient();
-  const { groceriesListData } = useGroceries();
 
-  //Here we are just adding a grocery to groceries[]
-  const updaterFunction = (
-    groceryItem: Grocery,
-    groceriesListData: Grocery[]
-  ) => [...groceriesListData, groceryItem];
+  const addingGrocery = useMutation<Grocery,Error,Grocery,Context>({
 
-  const updateGrocery = (apiResponse: Grocery, groceries: Grocery[]) => {
-    return groceries.map((grocery) =>
-      grocery.name == apiResponse.name ? apiResponse : grocery
-    );
-  };
-
-  const addingGrocery = useMutation({
-    onMutate: (groceryItem: Grocery) => {
-      const previousGroceryList = queryClient.getQueryData(CACHE_QUERY_KEY);
-      queryClient.setQueryData(
-        CACHE_QUERY_KEY,
-        updaterFunction(groceryItem, groceriesListData || [])
-      );
-      return previousGroceryList;
+    onMutate: (grocery) => {      
+      const previousGroceries = queryClient.getQueryData<Grocery[]>(CACHE_QUERY_KEY) || [];      
+      queryClient.setQueryData<Grocery[]>(CACHE_QUERY_KEY,groceries => [...(groceries || []),grocery]);      
+      return {previousGroceries};
     },
-
-    mutationFn: (groceryItem: Grocery) => apiClient.postItem(groceryItem),
+    
+    mutationFn: (groceryItem) => groceryService.postItem(groceryItem),
 
     //Success from API
-    onSuccess: (apiResponse) =>
-      queryClient.setQueryData(
-        CACHE_QUERY_KEY,
-        updateGrocery(apiResponse, groceriesListData || [])
-      ),
+    onSuccess: (apiResponse,grocery) => queryClient.setQueryData<Grocery[]>(CACHE_QUERY_KEY, groceries => groceries?.map(item => item === grocery ? apiResponse : item)),
 
     //Error from API
-    onError: (error, groceryItem, previousData) => {
-      if (!previousData) return;
-      queryClient.setQueryData(CACHE_QUERY_KEY, previousData);
-    },
+    onError: (error,grocery,context) => {
+      if (!context) return;
+      queryClient.setQueryData<Grocery[]>(CACHE_QUERY_KEY,context.previousGroceries);
+    }
   });
 
   return { addingGrocery };
