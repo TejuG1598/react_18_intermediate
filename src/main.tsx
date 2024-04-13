@@ -6,18 +6,20 @@ import "bootstrap/dist/css/bootstrap.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-      cacheTime: 300_000, //300,000 ms = 5min
-      staleTime: 10 * 1000,// 10sec
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false
-    }
-  }
-});
+// const queryClientProps = {
+//   defaultOptions: {
+//     queries: {
+//       retry: 3,
+//       cacheTime: 300_000, //300,000 ms = 5min
+//       staleTime: 10 * 1000,// 10sec
+//       refetchOnWindowFocus: false,
+//       refetchOnReconnect: false,
+//       refetchOnMount: false
+//     }
+//   }
+// }
+
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

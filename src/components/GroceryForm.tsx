@@ -27,7 +27,7 @@ const GroceryForm = () => {
             <label className="form-label">Name</label>
           </div>
           <div className="col-2">
-            <input ref={nameRef} type="text" className="className" />
+            <input ref={nameRef} type="text" className="form-control" />
           </div>
         </div>
         <div className="row mb-3">
@@ -39,7 +39,7 @@ const GroceryForm = () => {
               step="any"
               ref={priceRef}
               type="number"
-              className="className"
+              className="form-control"
             />
           </div>
         </div>
