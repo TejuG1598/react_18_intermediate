@@ -1,8 +1,10 @@
+import useDeleteGrocery from "../hooks/useDeleteGrocery";
 import useGroceries from "../hooks/useGroceries";
 import InputEachGrocery from "./GroceryForm";
 
 const GroceryListTable = () => {
   const { groceriesListData, error, isLoading } = useGroceries();
+  const {deleteGrocery} = useDeleteGrocery();
   let count = 1
 
   if (isLoading)
@@ -37,6 +39,7 @@ const GroceryListTable = () => {
             <th scope="col">ID</th>
             <th scope="col">Name</th>
             <th scope="col">Price</th>
+            <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -47,6 +50,7 @@ const GroceryListTable = () => {
                 <td>{eachGrocery.id}</td>
                 <td>{eachGrocery.name}</td>
                 <td>{eachGrocery.price.toFixed(2)}</td>
+                <td><button className="btn btn-outline-danger" onClick={() => deleteGrocery.mutate(eachGrocery)}>delete</button></td>
               </tr> 
             );
           })}

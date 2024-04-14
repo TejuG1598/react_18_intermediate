@@ -17,5 +17,7 @@ class APIClient<T>{
     postItem=(item: T)=>{
         return axiosInstance.post<T>(this.endpoint, item).then(res => res.data)
     }
+
+    delete = (id: number) => axiosInstance.delete(this.endpoint + '/' + id).then(res => res.data)
 }
 export default APIClient

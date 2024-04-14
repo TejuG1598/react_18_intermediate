@@ -3,26 +3,24 @@ import { CACHE_QUERY_KEY } from "../utils/Constants";
 import groceryService, { Grocery } from "../services/groceryService";
 
 interface ContextI {
-  previousData: Grocery[];
+  previousData : Grocery[]
 }
 
 function useAddGrocery() {
   const queryClient = useQueryClient();
 
-  const addingGrocery = useMutation<Grocery[], Error, Grocery, ContextI>({
-    onMutate: (groceryItem: Grocery) => {
-      const previousData = queryClient.getQueryData(CACHE_QUERY_KEY);
-      queryClient.setQueryData<Grocery[]>(
-        CACHE_QUERY_KEY,
-        (groceriesListData) => [...(groceriesListData || []), groceryItem]
-      );
+  const addingGrocery = useMutation<Grocery, Error, Grocery, ContextI>({
+
+    onMutate: (groceryItem) => {
+      const previousData = queryClient.getQueryData<Grocery[]>(CACHE_QUERY_KEY) || [];
+      queryClient.setQueryData<Grocery[]>(CACHE_QUERY_KEY,groceriesListData => [...(groceriesListData || []), groceryItem]);
       return { previousData };
     },
 
-    mutationFn: (groceryItem: Grocery) => groceryService.postItem(groceryItem),
+    mutationFn: (groceryItem) => groceryService.postItem(groceryItem),
 
     //Success from API
-    onSuccess: (apiResponse: Grocery, groceryItem: Grocery) =>
+    onSuccess: (apiResponse, groceryItem) =>
       queryClient.setQueryData<Grocery[]>(
         CACHE_QUERY_KEY,
         (groceriesListData) =>
@@ -32,9 +30,9 @@ function useAddGrocery() {
       ),
 
     //Error from API
-    onError: (error: Error, groceryItem: Grocery, previousData: ContextI) => {
-      if (!previousData) return;
-      queryClient.setQueryData(CACHE_QUERY_KEY, previousData);
+    onError: (error, groceryItem, context) => {
+      if (!context) return;
+      queryClient.setQueryData<Grocery[]>(CACHE_QUERY_KEY, context.previousData);
     },
   });
 
